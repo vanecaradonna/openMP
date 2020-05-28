@@ -1,0 +1,39 @@
+/*Ejercicio 4*/
+/*Bloques estructurados.
+Suponga los siguientes fragmentos de programa e indique por que los lazos no son
+susceptibles de ser paralelizados.*/
+
+for (i=0;i<n;i++) {
+	a[i] = 2.3*i;
+	if (a[i] < b[i]) break;
+}
+/*
+Este lazo no es suceptible para ser parametrizado porque cuando se cumpla la condicion del if
+el programa va a terminar. Entonces no se sabe en que momento puede cumplir la condicion del if
+y deberia terminar la iteracion 
+*/
+
+flag = 0;
+for (i=0;(i<n) & (!flag);i++){
+	a[i] = 2.3*i;
+	if (a[i] < b[i]) flag = 1;
+}
+/*
+En este caso como la condicion del for depende de la variable flag, y esta solo se modifica cuando
+la condicion del if verdadera, y el for deberia terminar. Si la variable flag, en una de las ejecuciones
+de los hilos, se puede modificar y terminar con el loop y los otros hilos seguirian ejecutando el for cuando 
+deberian terminar, y las ejecuciones de las iteraciones, despues que se modica el flag no deberian hacerse
+*/
+
+/*
+Ejemplo
+	hilo 0												hilo 1
+	a[1]=2.3*1											a[3]=2.3*3
+	if (a[1] < b[1]) [Falso]							if (a[3] < b[3]) [Falso]
+
+	a[2] = 2.3*2;										a[4] = 2.3*4;
+	if (a[2] < b[2])[ Verdadero] flag = 1;				if (a[4] < b[4])[ Verdadero] flag = 1;
+
+	Las iteraciones realizadas por el hilo 1 no se deberia haber realizado ya que en la posicion i=2, se terminaria 
+	el loop
+*/
