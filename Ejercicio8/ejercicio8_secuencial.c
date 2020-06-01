@@ -18,41 +18,55 @@ Secciones
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#define N 4
+#define N 1000000
+#define ITERACIONES 50
 
 void inicializar(int[]);
 int minimo (int[]);
 int maximo (int[]);
 int multiplicacion(int[]);
 float desviacion(int []);
+double promedio (double []);
 
 int main(){
-	int a[N], min, max, mul;
+	int a[N], min, max, mul, k, i;
 	float des;
+	double start, end;
+    double costo_secuncial[ITERACIONES], promedio_secuencial=0;
+
 	inicializar(a);
-	min= minimo(a);
-	max= maximo(a);
-	mul=multiplicacion(a);
-	des=desviacion(a);
-
-	for (int i = 0; i < N; i++)
+	
+	for (k=0; k<ITERACIONES; k++)
 	{
-		printf("%d  ", i);
+		start = omp_get_wtime();
+		min= minimo(a);
+		max= maximo(a);
+		mul=multiplicacion(a);
+		des=desviacion(a);
+		printf("\n");	
+		printf("El minimo del arreglo es: %d\n", min);
+		printf("El maximo del arreglo es: %d\n", max);
+		printf("La multiplicación del arreglo es: %d\n", mul);
+		printf("La desviación del arreglo es: %f\n", des);
+
+		end = omp_get_wtime();
+		costo_secuncial[k] = end - start;
+
 	}
+	promedio_secuencial=promedio(costo_secuncial);
+	printf("El promedio de la ejecucion secuencial es de: %f \n", promedio_secuencial );
+	
+}
 
-	printf("\n");
-
-	for (int i = 0; i < N; i++)
+double promedio (double costo[]){
+	double suma=0, prom=0;
+	int i=0;
+	for (i = 0; i < ITERACIONES; ++i)
 	{
-		printf("%d  ", a[i]);
+		suma=suma+costo[i];
 	}
-	printf("\n");	
-
-
-	printf("El minimo del arreglo es: %d\n", min);
-	printf("El maximo del arreglo es: %d\n", max);
-	printf("La multiplicación del arreglo es: %d\n", mul);
-	printf("La desviación del arreglo es: %f\n", des);
+	prom=suma/ITERACIONES;
+	return(prom);
 
 }
 
