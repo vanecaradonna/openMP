@@ -41,18 +41,15 @@ double promedio (double []);
 int main() {
 	int arreglo[N],i, j;
 	double start, end;
-    double costo_open[ITERACIONES], costo_secuncial[ITERACIONES], promedio_open=0, promedio_secuencial=0, speedup=0;
+    double costo_open=0, costo_secuncial=0, promedio_open=0, promedio_secuencial=0, speedup=0;
 
-    #pragma omp parallel
-    {
     /*Inicializo el arreglo*/
-    	#pragma omp for
-			for (i = 0; i < N; i++)
-			{
-				arreglo[i]=rand() % (100) +1;//Numero ramdom entre N y 1
-				//printf("arreglo[%d]=%d\n", i, arreglo[i]);
-			}
+	for (i = 0; i < N; i++)
+	{
+		arreglo[i]=rand() % (100) +1;//Numero ramdom entre N y 1
+		//printf("arreglo[%d]=%d\n", i, arreglo[i]);
 	}
+	
 
 	for (j = 0; j < ITERACIONES; j++)
 	{
@@ -60,14 +57,14 @@ int main() {
 		start = omp_get_wtime();	
 		ejecucion_opemnMP(arreglo);
 		end = omp_get_wtime();
-		costo_open[j] = end - start;
+		costo_open= costo_open + (end - start);
 		printf("_____________________________________________________________________________________\n");
 
 		printf("Ejecicion secuencial\n");
 		start = omp_get_wtime();
 		ejecucion_secuncial(arreglo);
 		end = omp_get_wtime();
-		costo_secuncial[j]=end - start;;
+		costo_secuncial=costo_secuncial+ (end - start);
 		//printf("costo_secuncial[%d]=%f  ",j, costo_secuencial[i]);
 		printf("_____________________________________________________________________________________\n");
 		
@@ -75,12 +72,12 @@ int main() {
 
 	//printf("\nCosto_open\n");
 	//imprimir_costo(costo_open);
-	promedio_open=promedio(costo_open);
+	promedio_open=costo_open/ITERACIONES;
 	printf("El promedio de la ejecucion con OpenMP es de: %f \n", promedio_open );
 	
 	//printf("\nCosto secuencial\n");
 	//imprimir_costo(costo_secuncial);
-	promedio_secuencial=promedio(costo_secuncial);
+	promedio_secuencial=costo_secuncial/ITERACIONES;
 	printf("El promedio de la ejecucion secuencial es de: %f \n", promedio_secuencial );
     
 	/*Calcular speedup*/
@@ -142,35 +139,21 @@ void ejecucion_opemnMP(int arreglo[]){
 			/*Minimo*/
 			#pragma omp section
 			{
-				min=arreglo[0];
-				for (i = 0; i < N; i++)
-				{
-					if (min>arreglo[i]){
-						min= arreglo[i];
-					}
-				}
+				min=minimo(arreglo);
 				printf("Hilo %d: El minimo del arreglo es: %d\n",omp_get_thread_num(), min);
 			}
 			/*Maximo*/
 			#pragma omp section
 			{
-				max=arreglo[0];
-				for (j = 0; j < N; j++)
-				{
-					if (max<arreglo[j]){
-						max= arreglo[j];
-					}
-				}
+				max=maximo(arreglo);
 				printf("Hilo %d: El maximo del arreglo es: %d\n",omp_get_thread_num(), max);
 
 			}
 			/*Multiplicacion*/
 			#pragma omp section
 			{
-				for (k = 0; k < N; k++)
-				{
-					mult = mult * arreglo[k];
-				}
+				mult = multiplicacion(arreglo);
+				
 				printf("Hilo %d: La multiplicación del arreglo es: %f\n", omp_get_thread_num(), mult);
 
 			}
@@ -178,20 +161,7 @@ void ejecucion_opemnMP(int arreglo[]){
 			/*Desviacion*/
 			#pragma omp section
 			{
-				for (l = 0; l < N; l++)
-				{
-					suma=suma + arreglo[l];
-				}
-				media= suma / N;
-				suma=0;
-				for (l= 0; l< N; l++)
-				{
-					aux2= arreglo[l]-media;
-					suma= suma + pow(aux2, 2);
-				}
-
-				aux= suma/N;
-				des= sqrt(aux);
+				des= desviacion(arreglo);
 				printf("Hilo %d: La desviación del arreglo es: %f\n", omp_get_thread_num(), des);
 
 			}
