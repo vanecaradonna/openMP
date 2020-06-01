@@ -63,14 +63,14 @@ int main() {
 		costo_open[j] = end - start;
 		printf("_____________________________________________________________________________________\n");
 
-		/*printf("Ejecicion secuencial\n");
+		printf("Ejecicion secuencial\n");
 		start = omp_get_wtime();
 		ejecucion_secuncial(arreglo);
 		end = omp_get_wtime();
 		costo_secuncial[j]=end - start;;
 		//printf("costo_secuncial[%d]=%f  ",j, costo_secuencial[i]);
 		printf("_____________________________________________________________________________________\n");
-		*/
+		
 	}
 
 	//printf("\nCosto_open\n");
@@ -80,12 +80,12 @@ int main() {
 	
 	//printf("\nCosto secuencial\n");
 	//imprimir_costo(costo_secuncial);
-	/*promedio_secuencial=promedio(costo_secuncial);
+	promedio_secuencial=promedio(costo_secuncial);
 	printf("El promedio de la ejecucion secuencial es de: %f \n", promedio_secuencial );
-    */
+    
 	/*Calcular speedup*/
-	//speedup = promedio_secuencial/promedio_open;
-	//printf("El speed up obtenido es de: %f\n",speedup); 
+	speedup = promedio_secuencial/promedio_open;
+	printf("El speed up obtenido es de: %f\n",speedup); 
 }
 
 double promedio (double costo[]){
@@ -135,7 +135,7 @@ void ejecucion_opemnMP(int arreglo[]){
 	int min, max,  i=0, j=0, k=0, l=0;
 	float media=0, suma=0, aux=0, aux2=0, des;
 	double mult=1;
-	#pragma omp parallel num_threads(5)
+	#pragma omp parallel 
 	{
 		#pragma omp sections 
 		{
